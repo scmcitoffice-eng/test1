@@ -47,44 +47,80 @@
 
     .container { max-width: 960px; margin: 0 auto; }
 
+    /* Loading overlay */
+    #loadingOverlay {
+      position: fixed; inset: 0;
+      background: var(--bg-tertiary);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 14px; z-index: 100;
+      transition: opacity 0.3s;
+    }
+    #loadingOverlay.hidden { opacity: 0; pointer-events: none; }
+    .spinner {
+      width: 32px; height: 32px;
+      border: 2.5px solid var(--border-md);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    #loadingOverlay p { font-size: 14px; color: var(--text-secondary); }
+
+    /* Toast */
+    #toast {
+      position: fixed; bottom: 1.5rem; right: 1.5rem;
+      background: var(--bg-primary); border: 0.5px solid var(--border-md);
+      border-radius: var(--radius-md); padding: 10px 16px;
+      font-size: 13px; color: var(--text-primary);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.10);
+      opacity: 0; transform: translateY(8px);
+      transition: opacity 0.2s, transform 0.2s;
+      pointer-events: none; z-index: 200;
+      display: flex; align-items: center; gap: 8px;
+    }
+    #toast.show { opacity: 1; transform: translateY(0); }
+    #toast.success i { color: var(--accent); }
+    #toast.error   i { color: #A32D2D; }
+
     /* Topbar */
     .topbar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      flex-wrap: wrap;
-      margin-bottom: 1.5rem;
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 12px; flex-wrap: wrap; margin-bottom: 1.5rem;
     }
     .topbar h1 {
-      font-size: 22px;
-      font-weight: 500;
-      color: var(--text-primary);
-      display: flex;
-      align-items: center;
-      gap: 8px;
+      font-size: 22px; font-weight: 500; color: var(--text-primary);
+      display: flex; align-items: center; gap: 8px;
     }
     .topbar h1 i { color: var(--accent); font-size: 24px; }
+
+    /* Firebase status badge */
+    .db-badge {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 12px; color: var(--text-secondary);
+      background: var(--bg-secondary);
+      border: 0.5px solid var(--border);
+      border-radius: 99px; padding: 4px 10px;
+    }
+    .db-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: #ccc; transition: background 0.3s;
+    }
+    .db-dot.connected    { background: var(--accent); }
+    .db-dot.disconnected { background: #A32D2D; }
+    .db-dot.connecting   { background: #BA7517; animation: pulse 1s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
     .controls { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
 
     /* Form elements */
-    input[type="text"],
-    input[type="number"],
-    select {
-      height: 36px;
-      padding: 0 10px;
-      font-size: 14px;
-      font-family: var(--font);
-      background: var(--bg-primary);
-      color: var(--text-primary);
-      border: 0.5px solid var(--border-md);
-      border-radius: var(--radius-md);
-      outline: none;
-      transition: border-color 0.15s;
+    input[type="text"], input[type="number"], select {
+      height: 36px; padding: 0 10px; font-size: 14px;
+      font-family: var(--font); background: var(--bg-primary);
+      color: var(--text-primary); border: 0.5px solid var(--border-md);
+      border-radius: var(--radius-md); outline: none; transition: border-color 0.15s;
     }
-    input[type="text"]:focus,
-    input[type="number"]:focus,
-    select:focus {
+    input[type="text"]:focus, input[type="number"]:focus, select:focus {
       border-color: var(--accent);
       box-shadow: 0 0 0 3px rgba(29,158,117,0.15);
     }
@@ -94,73 +130,44 @@
     .stat-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-      gap: 10px;
-      margin-bottom: 1.5rem;
+      gap: 10px; margin-bottom: 1.5rem;
     }
-    .stat {
-      background: var(--bg-secondary);
-      border-radius: var(--radius-md);
-      padding: 0.75rem 1rem;
-    }
+    .stat { background: var(--bg-secondary); border-radius: var(--radius-md); padding: 0.75rem 1rem; }
     .stat .label { font-size: 12px; color: var(--text-secondary); margin-bottom: 4px; }
     .stat .value { font-size: 22px; font-weight: 500; color: var(--text-primary); }
-    .stat .value.warn { color: #BA7517; }
+    .stat .value.warn   { color: #BA7517; }
     .stat .value.danger { color: #A32D2D; }
 
     /* Add form */
     .add-form {
-      background: var(--bg-primary);
-      border: 0.5px solid var(--border);
-      border-radius: var(--radius-lg);
-      padding: 1rem 1.25rem;
-      margin-bottom: 1.5rem;
+      background: var(--bg-primary); border: 0.5px solid var(--border);
+      border-radius: var(--radius-lg); padding: 1rem 1.25rem; margin-bottom: 1.5rem;
     }
     .add-form h2 { font-size: 14px; font-weight: 500; color: var(--text-secondary); margin-bottom: 12px; }
-    .form-row {
-      display: grid;
-      grid-template-columns: 2fr 1fr 1fr 1fr auto;
-      gap: 8px;
-      align-items: end;
-    }
+    .form-row { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr auto; gap: 8px; align-items: end; }
     .field label { font-size: 12px; color: var(--text-secondary); display: block; margin-bottom: 4px; }
     .field input, .field select { width: 100%; }
 
     .btn-add {
-      height: 36px;
-      padding: 0 16px;
-      background: var(--accent);
-      color: white;
-      border: none;
-      border-radius: var(--radius-md);
-      cursor: pointer;
-      font-size: 14px;
-      font-family: var(--font);
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      white-space: nowrap;
+      height: 36px; padding: 0 16px; background: var(--accent); color: white;
+      border: none; border-radius: var(--radius-md); cursor: pointer;
+      font-size: 14px; font-family: var(--font);
+      display: flex; align-items: center; gap: 6px; white-space: nowrap;
       transition: background 0.15s;
     }
     .btn-add:hover { background: var(--accent-dark); }
+    .btn-add:disabled { opacity: 0.5; cursor: not-allowed; }
 
     /* Table */
     .table-wrap {
-      background: var(--bg-primary);
-      border: 0.5px solid var(--border);
-      border-radius: var(--radius-lg);
-      overflow: hidden;
+      background: var(--bg-primary); border: 0.5px solid var(--border);
+      border-radius: var(--radius-lg); overflow: hidden;
     }
     table { width: 100%; border-collapse: collapse; table-layout: fixed; font-size: 14px; }
     thead th {
-      background: var(--bg-secondary);
-      padding: 10px 12px;
-      text-align: left;
-      font-size: 12px;
-      font-weight: 500;
-      color: var(--text-secondary);
-      border-bottom: 0.5px solid var(--border);
-      cursor: pointer;
-      user-select: none;
+      background: var(--bg-secondary); padding: 10px 12px; text-align: left;
+      font-size: 12px; font-weight: 500; color: var(--text-secondary);
+      border-bottom: 0.5px solid var(--border); cursor: pointer; user-select: none;
     }
     thead th:hover { color: var(--text-primary); }
     thead th i { font-size: 12px; vertical-align: middle; margin-left: 2px; }
@@ -170,13 +177,7 @@
     tbody td { padding: 10px 12px; color: var(--text-primary); }
 
     /* Badges */
-    .badge {
-      display: inline-block;
-      font-size: 11px;
-      padding: 2px 8px;
-      border-radius: 99px;
-      font-weight: 500;
-    }
+    .badge { display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 99px; font-weight: 500; }
     .cat-electronics { background: #E6F1FB; color: #0C447C; }
     .cat-clothing    { background: #FBEAF0; color: #72243E; }
     .cat-food        { background: #EAF3DE; color: #3B6D11; }
@@ -191,45 +192,29 @@
       .cat-other       { background: #2C2C2A; color: #D3D1C7; }
     }
 
-    /* Stock status */
-    .stock-ok     { color: var(--text-primary); }
-    .stock-low    { color: #BA7517; font-weight: 500; }
-    .stock-out    { color: #A32D2D; font-weight: 500; }
+    .stock-ok  { color: var(--text-primary); }
+    .stock-low { color: #BA7517; font-weight: 500; }
+    .stock-out { color: #A32D2D; font-weight: 500; }
 
-    /* Row action buttons */
     .row-actions { display: flex; gap: 4px; }
     .btn-icon {
-      background: none;
-      border: 0.5px solid var(--border);
-      border-radius: var(--radius-md);
-      width: 28px; height: 28px;
-      cursor: pointer;
+      background: none; border: 0.5px solid var(--border); border-radius: var(--radius-md);
+      width: 28px; height: 28px; cursor: pointer;
       display: flex; align-items: center; justify-content: center;
-      color: var(--text-secondary);
-      font-size: 15px;
-      transition: all 0.1s;
-      padding: 0;
+      color: var(--text-secondary); font-size: 15px; transition: all 0.1s; padding: 0;
     }
-    .btn-icon:hover { background: var(--bg-secondary); color: var(--text-primary); }
-    .btn-icon.danger:hover { background: #FCEBEB; color: #A32D2D; border-color: #F09595; }
-    .btn-icon.edit:hover   { background: var(--accent-light); color: var(--accent-dark); border-color: #5DCAA5; }
+    .btn-icon:hover         { background: var(--bg-secondary); color: var(--text-primary); }
+    .btn-icon.danger:hover  { background: #FCEBEB; color: #A32D2D; border-color: #F09595; }
+    .btn-icon.edit:hover    { background: var(--accent-light); color: var(--accent-dark); border-color: #5DCAA5; }
+    .btn-icon:disabled      { opacity: 0.4; cursor: not-allowed; pointer-events: none; }
 
-    /* Empty state */
-    .empty {
-      padding: 2.5rem;
-      text-align: center;
-      color: var(--text-secondary);
-      font-size: 14px;
-    }
+    .empty { padding: 2.5rem; text-align: center; color: var(--text-secondary); font-size: 14px; }
 
-    /* Inline edit row */
     .edit-row td { background: var(--accent-light) !important; }
     .edit-row input, .edit-row select { width: 100%; font-size: 13px; }
 
-    /* Sort indicator active */
     .sort-active { color: var(--accent) !important; }
 
-    /* Responsive */
     @media (max-width: 680px) {
       .form-row { grid-template-columns: 1fr 1fr; }
       table { font-size: 12px; }
@@ -239,25 +224,44 @@
   </style>
 </head>
 <body>
+
+<!-- Loading overlay -->
+<div id="loadingOverlay">
+  <div class="spinner"></div>
+  <p>Connecting to database…</p>
+</div>
+
+<!-- Toast notification -->
+<div id="toast" role="status" aria-live="polite">
+  <i class="ti ti-check" aria-hidden="true"></i>
+  <span id="toastMsg"></span>
+</div>
+
 <div class="container">
 
   <div class="topbar">
     <h1><i class="ti ti-package" aria-hidden="true"></i> Inventory</h1>
-    <div class="controls">
-      <input type="text" id="searchInput" placeholder="Search products…" oninput="render()" />
-      <select id="catFilter" onchange="render()">
-        <option value="">All categories</option>
-        <option value="Electronics">Electronics</option>
-        <option value="Clothing">Clothing</option>
-        <option value="Food">Food</option>
-        <option value="Tools">Tools</option>
-        <option value="Other">Other</option>
-      </select>
-      <select id="stockFilter" onchange="render()">
-        <option value="">All stock</option>
-        <option value="low">Low stock</option>
-        <option value="out">Out of stock</option>
-      </select>
+    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+      <div class="db-badge">
+        <div class="db-dot connecting" id="dbDot"></div>
+        <span id="dbLabel">Connecting…</span>
+      </div>
+      <div class="controls">
+        <input type="text" id="searchInput" placeholder="Search products…" oninput="render()" />
+        <select id="catFilter" onchange="render()">
+          <option value="">All categories</option>
+          <option value="Electronics">Electronics</option>
+          <option value="Clothing">Clothing</option>
+          <option value="Food">Food</option>
+          <option value="Tools">Tools</option>
+          <option value="Other">Other</option>
+        </select>
+        <select id="stockFilter" onchange="render()">
+          <option value="">All stock</option>
+          <option value="low">Low stock</option>
+          <option value="out">Out of stock</option>
+        </select>
+      </div>
     </div>
   </div>
 
@@ -288,7 +292,7 @@
         <label for="newPrice">Price (₱)</label>
         <input type="number" id="newPrice" min="0" step="0.01" placeholder="0.00" />
       </div>
-      <button class="btn-add" onclick="addProduct()">
+      <button class="btn-add" id="btnAdd" onclick="addProduct()">
         <i class="ti ti-plus" aria-hidden="true"></i> Add
       </button>
     </div>
@@ -316,34 +320,147 @@
 
 </div>
 
+<!-- Firebase SDK (compat version — works directly in a browser without a bundler) -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+
 <script>
-  let products = [
-    { id: 1, name: 'USB-C Charging Cable',   category: 'Electronics', qty: 120, price: 299 },
-    { id: 2, name: 'Wireless Mouse',          category: 'Electronics', qty: 8,   price: 850 },
-    { id: 3, name: 'Cotton T-Shirt (M)',      category: 'Clothing',    qty: 0,   price: 450 },
-    { id: 4, name: 'Instant Noodles (pack)',  category: 'Food',        qty: 200, price: 35  },
-    { id: 5, name: 'Flathead Screwdriver',    category: 'Tools',       qty: 25,  price: 180 },
-    { id: 6, name: 'HDMI Cable 2m',           category: 'Electronics', qty: 3,   price: 399 },
-    { id: 7, name: 'Cargo Shorts (L)',        category: 'Clothing',    qty: 15,  price: 680 },
-  ];
-  let nextId = 8;
-  let sortKey = 'name';
-  let sortDir = 1;
-  let editId  = null;
+  /* ─── Firebase init ─────────────────────────────────────────────── */
+  const firebaseConfig = {
+    apiKey:            "AIzaSyC2_rFSAI85nz_0ndEIKRMT99U4PFMTjyE",
+    authDomain:        "inventory-management-7c050.firebaseapp.com",
+    databaseURL:       "https://inventory-management-7c050-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId:         "inventory-management-7c050",
+    storageBucket:     "inventory-management-7c050.firebasestorage.app",
+    messagingSenderId: "224398192649",
+    appId:             "1:224398192649:web:04f27c01b8f6c21c6bc8d8",
+    measurementId:     "G-X4P5WFXMFS"
+  };
 
-  function catClass(c) { return 'cat-' + c.toLowerCase(); }
+  firebase.initializeApp(firebaseConfig);
+  const db            = firebase.database();
+  const productsRef   = db.ref('products');
 
-  function stockClass(qty) {
-    if (qty === 0)  return 'stock-out';
-    if (qty < 10)   return 'stock-low';
-    return 'stock-ok';
+  /* ─── Connection status ─────────────────────────────────────────── */
+  const connRef  = db.ref('.info/connected');
+  const dbDot    = document.getElementById('dbDot');
+  const dbLabel  = document.getElementById('dbLabel');
+
+  connRef.on('value', snap => {
+    if (snap.val()) {
+      dbDot.className  = 'db-dot connected';
+      dbLabel.textContent = 'Connected';
+    } else {
+      dbDot.className  = 'db-dot disconnected';
+      dbLabel.textContent = 'Offline';
+    }
+  });
+
+  /* ─── App state ─────────────────────────────────────────────────── */
+  let products = [];   // local mirror of Firebase data
+  let sortKey  = 'name';
+  let sortDir  = 1;
+  let editId   = null; // Firebase key of row being edited
+
+  /* ─── Toast helper ──────────────────────────────────────────────── */
+  let toastTimer;
+  function showToast(msg, type = 'success') {
+    const t   = document.getElementById('toast');
+    const ico = t.querySelector('i');
+    document.getElementById('toastMsg').textContent = msg;
+    t.className = 'show ' + type;
+    ico.className = type === 'success' ? 'ti ti-check' : 'ti ti-alert-circle';
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => { t.className = ''; }, 2500);
   }
 
-  function stockLabel(qty) {
-    if (qty === 0)  return '⚠ Out';
-    if (qty < 10)   return '↓ ' + qty;
-    return qty;
+  /* ─── Real-time listener: sync Firebase → local array → render ── */
+  let initialLoad = true;
+
+  productsRef.on('value', snapshot => {
+    products = [];
+    snapshot.forEach(child => {
+      products.push({ firebaseKey: child.key, ...child.val() });
+    });
+
+    if (initialLoad) {
+      initialLoad = false;
+      const overlay = document.getElementById('loadingOverlay');
+      overlay.classList.add('hidden');
+      setTimeout(() => overlay.remove(), 400);
+    }
+    render();
+  }, err => {
+    console.error('Firebase read error:', err);
+    showToast('Database read error: ' + err.message, 'error');
+  });
+
+  /* ─── CRUD helpers ──────────────────────────────────────────────── */
+
+  function addProduct() {
+    const name  = document.getElementById('newName').value.trim();
+    const cat   = document.getElementById('newCat').value;
+    const qty   = parseInt(document.getElementById('newQty').value)    || 0;
+    const price = parseFloat(document.getElementById('newPrice').value) || 0;
+    if (!name) { document.getElementById('newName').focus(); return; }
+
+    const btn = document.getElementById('btnAdd');
+    btn.disabled = true;
+
+    productsRef.push({ name, category: cat, qty, price, createdAt: Date.now() })
+      .then(() => {
+        document.getElementById('newName').value  = '';
+        document.getElementById('newQty').value   = '';
+        document.getElementById('newPrice').value = '';
+        showToast(`"${name}" added`);
+      })
+      .catch(err => showToast('Add failed: ' + err.message, 'error'))
+      .finally(() => { btn.disabled = false; });
   }
+
+  function deleteProduct(firebaseKey, name) {
+    if (!confirm(`Delete "${name}"?`)) return;
+    if (editId === firebaseKey) editId = null;
+
+    productsRef.child(firebaseKey).remove()
+      .then(() => showToast(`"${name}" deleted`))
+      .catch(err => showToast('Delete failed: ' + err.message, 'error'));
+  }
+
+  function startEdit(firebaseKey) {
+    editId = firebaseKey;
+    render();
+    setTimeout(() => {
+      const el = document.getElementById('e-name');
+      if (el) el.focus();
+    }, 50);
+  }
+
+  function cancelEdit() { editId = null; render(); }
+
+  function saveEdit(firebaseKey) {
+    const name  = document.getElementById('e-name').value.trim();
+    const cat   = document.getElementById('e-cat').value;
+    const qty   = parseInt(document.getElementById('e-qty').value)    || 0;
+    const price = parseFloat(document.getElementById('e-price').value) || 0;
+    if (!name) return;
+
+    productsRef.child(firebaseKey).update({ name, category: cat, qty, price })
+      .then(() => { editId = null; showToast(`"${name}" updated`); })
+      .catch(err => showToast('Update failed: ' + err.message, 'error'));
+  }
+
+  /* ─── Sorting ───────────────────────────────────────────────────── */
+  function sortBy(key) {
+    if (sortKey === key) sortDir *= -1;
+    else { sortKey = key; sortDir = 1; }
+    render();
+  }
+
+  /* ─── Helpers ───────────────────────────────────────────────────── */
+  function catClass(c)    { return 'cat-' + c.toLowerCase(); }
+  function stockClass(q)  { return q === 0 ? 'stock-out' : q < 10 ? 'stock-low' : 'stock-ok'; }
+  function stockLabel(q)  { return q === 0 ? '⚠ Out' : q < 10 ? '↓ ' + q : q; }
 
   function getFiltered() {
     const q   = document.getElementById('searchInput').value.toLowerCase();
@@ -364,6 +481,7 @@
     });
   }
 
+  /* ─── Render ────────────────────────────────────────────────────── */
   function renderStats() {
     const total    = products.length;
     const totalVal = products.reduce((s, p) => s + p.qty * p.price, 0);
@@ -375,12 +493,6 @@
       <div class="stat"><div class="label">Low stock</div><div class="value warn">${low}</div></div>
       <div class="stat"><div class="label">Out of stock</div><div class="value danger">${out}</div></div>
     `;
-  }
-
-  function sortBy(key) {
-    if (sortKey === key) sortDir *= -1;
-    else { sortKey = key; sortDir = 1; }
-    render();
   }
 
   function render() {
@@ -402,92 +514,44 @@
     empty.style.display = 'none';
 
     tbody.innerHTML = rows.map(p => {
-      if (editId === p.id) {
+      const fk = p.firebaseKey;
+      if (editId === fk) {
         return `<tr class="edit-row">
-          <td><input type="text" id="e-name" value="${p.name}" /></td>
+          <td><input type="text"   id="e-name"  value="${escHtml(p.name)}" /></td>
           <td><select id="e-cat">
             ${['Electronics','Clothing','Food','Tools','Other'].map(c =>
-              `<option${c === p.category ? ' selected' : ''}>${c}</option>`
-            ).join('')}
+              `<option${c === p.category ? ' selected' : ''}>${c}</option>`).join('')}
           </select></td>
-          <td><input type="number" id="e-qty" value="${p.qty}" min="0" style="width:64px" /></td>
+          <td><input type="number" id="e-qty"   value="${p.qty}"   min="0" style="width:64px" /></td>
           <td><input type="number" id="e-price" value="${p.price}" min="0" step="0.01" style="width:80px" /></td>
           <td>₱${(p.qty * p.price).toLocaleString()}</td>
           <td><div class="row-actions">
-            <button class="btn-icon edit" onclick="saveEdit(${p.id})" title="Save" aria-label="Save">
-              <i class="ti ti-check" aria-hidden="true"></i>
-            </button>
-            <button class="btn-icon" onclick="cancelEdit()" title="Cancel" aria-label="Cancel">
-              <i class="ti ti-x" aria-hidden="true"></i>
-            </button>
+            <button class="btn-icon edit"   onclick="saveEdit('${fk}')"   title="Save"   aria-label="Save"><i class="ti ti-check" aria-hidden="true"></i></button>
+            <button class="btn-icon"        onclick="cancelEdit()"         title="Cancel" aria-label="Cancel"><i class="ti ti-x" aria-hidden="true"></i></button>
           </div></td>
         </tr>`;
       }
       return `<tr>
-        <td style="font-weight:500">${p.name}</td>
+        <td style="font-weight:500">${escHtml(p.name)}</td>
         <td><span class="badge ${catClass(p.category)}">${p.category}</span></td>
         <td class="${stockClass(p.qty)}">${stockLabel(p.qty)}</td>
         <td>₱${p.price.toLocaleString()}</td>
         <td>₱${(p.qty * p.price).toLocaleString()}</td>
         <td><div class="row-actions">
-          <button class="btn-icon edit" onclick="startEdit(${p.id})" title="Edit" aria-label="Edit ${p.name}">
-            <i class="ti ti-edit" aria-hidden="true"></i>
-          </button>
-          <button class="btn-icon danger" onclick="deleteProduct(${p.id})" title="Delete" aria-label="Delete ${p.name}">
-            <i class="ti ti-trash" aria-hidden="true"></i>
-          </button>
+          <button class="btn-icon edit"   onclick="startEdit('${fk}')"              title="Edit"   aria-label="Edit ${escHtml(p.name)}"><i class="ti ti-edit"  aria-hidden="true"></i></button>
+          <button class="btn-icon danger" onclick="deleteProduct('${fk}','${escHtml(p.name)}')" title="Delete" aria-label="Delete ${escHtml(p.name)}"><i class="ti ti-trash" aria-hidden="true"></i></button>
         </div></td>
       </tr>`;
     }).join('');
   }
 
-  function addProduct() {
-    const name  = document.getElementById('newName').value.trim();
-    const cat   = document.getElementById('newCat').value;
-    const qty   = parseInt(document.getElementById('newQty').value)   || 0;
-    const price = parseFloat(document.getElementById('newPrice').value) || 0;
-    if (!name) { document.getElementById('newName').focus(); return; }
-    products.push({ id: nextId++, name, category: cat, qty, price });
-    document.getElementById('newName').value  = '';
-    document.getElementById('newQty').value   = '';
-    document.getElementById('newPrice').value = '';
-    render();
-  }
-
-  function deleteProduct(id) {
-    if (!confirm('Delete this product?')) return;
-    products = products.filter(p => p.id !== id);
-    if (editId === id) editId = null;
-    render();
-  }
-
-  function startEdit(id) {
-    editId = id;
-    render();
-    setTimeout(() => {
-      const el = document.getElementById('e-name');
-      if (el) el.focus();
-    }, 50);
-  }
-
-  function cancelEdit() { editId = null; render(); }
-
-  function saveEdit(id) {
-    const p = products.find(x => x.id === id);
-    if (!p) return;
-    p.name     = document.getElementById('e-name').value.trim()         || p.name;
-    p.category = document.getElementById('e-cat').value;
-    p.qty      = parseInt(document.getElementById('e-qty').value)        || 0;
-    p.price    = parseFloat(document.getElementById('e-price').value)    || 0;
-    editId = null;
-    render();
+  function escHtml(str) {
+    return String(str).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   }
 
   document.getElementById('newName').addEventListener('keydown', e => {
     if (e.key === 'Enter') addProduct();
   });
-
-  render();
 </script>
 </body>
 </html>
